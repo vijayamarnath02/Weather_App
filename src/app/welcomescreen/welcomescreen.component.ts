@@ -4,7 +4,7 @@ import { IonContent } from "@ionic/angular/standalone";
 @Component({
   selector: 'app-welcomescreen',
   templateUrl: './welcomescreen.component.html',
-  styleUrls: ['./welcomescreen.component.scss'],
+  styleUrls: ['./welcomescreen.component.css'],
   standalone: true,
   imports: [IonContent,]
 })
