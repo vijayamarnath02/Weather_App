@@ -40,7 +40,7 @@
 
     --ion-color-warning: #ffeb3b;
     --ion-color-warning-rgb: 255, 235, 59;
-    --ion-color-warning-contrast: #000000;
+    --ion-color-warning-contrast:#000000;
     --ion-color-warning-contrast-rgb: 0, 0, 0;
     --ion-color-warning-shade: #e0cf34;
     --ion-color-warning-tint: #ffed4f;
@@ -73,5 +73,19 @@
     --ion-color-dark-shade: #212c31;
     --ion-color-dark-tint: #3c474c;
 
+    --ion-background-color: transparent;
+    --ion-text-color: #ffffff;
+    --ion-color-step-50: #ffffff;
+    --ion-color-step-850: #ffffff;
 }
 
+body {
+    background: linear-gradient(to bottom, #e3f2fd, #3f51b5);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+}
+
+ion-content {
+    --background: transparent;
+    color: white;
+}
