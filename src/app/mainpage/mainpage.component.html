@@ -67,7 +67,8 @@
       <ion-col>
         <swiper-container slides-per-view="2" [loop]="true" [autoplay]="{ delay: 2000, disableOnInteraction: false }">
           @for (item of daysData; track $index) {
-          <swiper-slide><ion-card (click)="selectDate(item)">
+          <swiper-slide>
+            <ion-card (click)="selectDate(item)">
               <ion-card-header>
                 <img
                   [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + item.icon + '.png'"

@@ -55,7 +55,8 @@ export class MainpageComponent implements OnInit, OnDestroy {
       });
   }
   selectDate(item: any) {
-    localStorage.setItem("hours", item.hours);
+    localStorage.setItem("hours", JSON.stringify(item.hours));
+    localStorage.setItem("date", JSON.stringify(item.datetime))
     this.navigator();
   }
   navigator(): void {

@@ -1,3 +1,29 @@
-<p>
-  timeview works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-title
+      style="color: black;font-size: 1.5rem;align-items: center;justify-content: center;display: flex;font-weight: bold;">
+      {{date}} </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" [fullscreen]="true">
+  @for (item of hours; track $index) {
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <img
+              [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + item.icon + '.png'"
+              alt="{{ item.conditions }}" width="100" height="100" /></ion-col>
+          <ion-col><ion-row style="display: flex;justify-content: center;flex-direction: column;align-items: center;">
+              <ion-col style="padding: 10px;">
+                <ion-text> {{item.datetime}}</ion-text> </ion-col>
+              <ion-col style="padding: 10px;font-size: 1.5rem;color: black;">
+                <ion-text> {{ toCelsius(item.temp) }}°C</ion-text> </ion-col>
+            </ion-row></ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+  }
+</ion-content>
