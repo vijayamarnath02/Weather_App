@@ -1,16 +1,19 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { IonCol, IonContent, IonGrid, IonIcon, IonRow, IonText } from "@ionic/angular/standalone";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/core';
+import { IonCard, IonCardContent, IonCol, IonContent, IonGrid, IonIcon, IonRow, IonText } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
-import { locationOutline } from 'ionicons/icons';
+import { cloudOutline, eyeOutline, locationOutline, moonOutline, speedometerOutline, sunnyOutline, waterOutline } from 'ionicons/icons';
 import { catchError, map, of, Subject, takeUntil } from 'rxjs';
+import { register } from 'swiper/element/bundle';
 import { ApicallService } from '../apicall.service';
 
+register();
 @Component({
   selector: 'app-mainpage',
   templateUrl: './mainpage.component.html',
   styleUrls: ['./mainpage.component.css'],
   standalone: true,
-  imports: [IonText, IonCol, IonRow, IonGrid, IonIcon, IonContent,]
+  imports: [IonCardContent, IonCard, IonText, IonCol, IonRow, IonGrid, IonIcon, IonContent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MainpageComponent implements OnInit, OnDestroy {
   private desubscribe$ = new Subject<void>();
@@ -26,7 +29,7 @@ export class MainpageComponent implements OnInit, OnDestroy {
     hour12: true
   });
   constructor(private readonly apiServices: ApicallService) {
-    addIcons({ locationOutline });
+    addIcons({ waterOutline, speedometerOutline, cloudOutline, eyeOutline, sunnyOutline, moonOutline, locationOutline });
   }
 
   ngOnInit() {
@@ -51,7 +54,9 @@ export class MainpageComponent implements OnInit, OnDestroy {
         }
       });
   }
-
+  toCelsius(temp: number): string {
+    return ((temp - 32) * 5 / 9).toFixed(1);
+  }
   ngOnDestroy(): void {
     this.desubscribe$.next();      // emits value to unsubscribe
     this.desubscribe$.complete();

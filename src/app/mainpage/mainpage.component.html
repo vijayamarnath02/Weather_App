@@ -1,6 +1,6 @@
-<ion-content class="ion-padding" [fullscreen]="true" style="background-color: white;">
-  <ion-grid>
-    <ion-row style="text-align: center;justify-content: center;">
+<ion-content class="ion-padding" [fullscreen]="true">
+  <ion-grid class="weather-grid">
+    <ion-row>
       <ion-col>
         <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
           <ion-icon name="location-outline" size="large" color="primary"></ion-icon>
@@ -10,9 +10,85 @@
         </div>
       </ion-col>
     </ion-row>
+
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="6">
+        <ion-card class="weather-card ion-text-center">
+          <ion-card-content>
+            <ion-text color="primary">
+              <h1 style="font-size: 4rem; font-weight: bold;">{{ toCelsius(currentData.temp) }}°C</h1>
+            </ion-text>
+            <ion-text color="medium">
+              <p style="font-size: 1.2rem; text-transform: capitalize;">
+                {{ currentData.conditions }}
+              </p>
+              <img
+                [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + currentData.icon + '.png'"
+                alt="{{ currentData.conditions }}" width="100" height="100" />
+            </ion-text>
+            <ion-grid>
+              <ion-row style="color: black;">
+                <ion-col size=" 6">
+                  <ion-icon name="water-outline" style="color: black;"></ion-icon>
+                  <p style="color: black;">Humidity: {{ currentData.humidity }}%</p>
+                </ion-col>
+                <ion-col size="6">
+                  <ion-icon name="speedometer-outline"></ion-icon>
+                  <p>Pressure: {{ currentData.pressure }} hPa</p>
+                </ion-col>
+              </ion-row>
+              <ion-row style="color: black;">
+                <ion-col size=" 6">
+                  <ion-icon name="cloud-outline"></ion-icon>
+                  <p>Clouds: {{ currentData.cloudcover }}%</p>
+                </ion-col>
+                <ion-col size="6">
+                  <ion-icon name="eye-outline"></ion-icon>
+                  <p>Visibility: {{ currentData.visibility }} km</p>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="6">
+                  <ion-icon name="sunny-outline"></ion-icon>
+                  <p>Sunrise: {{ currentData.sunrise }}</p>
+                </ion-col>
+                <ion-col size="6">
+                  <ion-icon name="moon-outline"></ion-icon>
+                  <p>Sunset: {{ currentData.sunset }}</p>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
     <ion-row>
-      <ion-col style="align-items: center;text-align: center;">
-        <ion-text color="medium">{{this.date}}</ion-text>
+      <ion-col>
+        <swiper-container slides-per-view="2" [speed]="100" [loop]="true"
+          [autoplay]="{ delay: 2000, disableOnInteraction: false }">
+          @for (item of daysData; track $index) {
+          <swiper-slide><ion-card>
+              <ion-card-header>
+                <img
+                  [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + item.icon + '.png'"
+                  alt="{{ item.conditions }}" width="100" height="100" />
+              </ion-card-header>
+
+              <ion-card-content>
+                <ion-text
+                  style="text-align: center;align-items: center;justify-content: center;display: flex;font-size: 2rem;color: black;">
+                  {{ toCelsius(currentData.temp) }}°C
+                </ion-text>
+                <ion-text
+                  style="text-align: center;align-items: center;justify-content: center;display: flex;font-size: 1rem;color: azure;">
+                  {{item.datetime}}
+                </ion-text>
+              </ion-card-content>
+            </ion-card></swiper-slide>
+          }
+        </swiper-container>
+
       </ion-col>
     </ion-row>
 

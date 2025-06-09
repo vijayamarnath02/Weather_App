@@ -35,7 +35,7 @@
                 "output": "assets"
               }
             ],
-            "styles": ["src/global.css", "src/theme/variables.css"],
+            "styles": ["src/global.css", "src/theme/variables.css","node_modules/swiper/swiper-bundle.min.css"],
             "scripts": [],
             "browser": "src/main.ts"
           },
