@@ -47,8 +47,8 @@
                   <p>Visibility: {{ currentData.visibility }} km</p>
                 </ion-col>
               </ion-row>
-              <ion-row>
-                <ion-col size="6">
+              <ion-row style="color: black;">
+                <ion-col size="6" color="primary">
                   <ion-icon name="sunny-outline"></ion-icon>
                   <p>Sunrise: {{ currentData.sunrise }}</p>
                 </ion-col>
@@ -65,10 +65,9 @@
     </ion-row>
     <ion-row>
       <ion-col>
-        <swiper-container slides-per-view="2" [speed]="100" [loop]="true"
-          [autoplay]="{ delay: 2000, disableOnInteraction: false }">
+        <swiper-container slides-per-view="2" [loop]="true" [autoplay]="{ delay: 2000, disableOnInteraction: false }">
           @for (item of daysData; track $index) {
-          <swiper-slide><ion-card>
+          <swiper-slide><ion-card (click)="selectDate(item)">
               <ion-card-header>
                 <img
                   [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + item.icon + '.png'"

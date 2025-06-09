@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./welcomescreen/welcomescreen.component').then((m) => m.WelcomescreenComponent)
   },
   {
+    path: 'time',
+    loadComponent: () => import('./timeview/timeview.component').then((m) => m.TimeviewComponent)
+  },
+  {
     path: '',
     redirectTo: 'welcome',
     pathMatch: 'full',

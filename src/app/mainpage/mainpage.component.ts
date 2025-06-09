@@ -1,4 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { IonCard, IonCardContent, IonCol, IonContent, IonGrid, IonIcon, IonRow, IonText } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
 import { cloudOutline, eyeOutline, locationOutline, moonOutline, speedometerOutline, sunnyOutline, waterOutline } from 'ionicons/icons';
@@ -28,7 +29,7 @@ export class MainpageComponent implements OnInit, OnDestroy {
     minute: '2-digit',
     hour12: true
   });
-  constructor(private readonly apiServices: ApicallService) {
+  constructor(private readonly apiServices: ApicallService, private readonly router: Router) {
     addIcons({ waterOutline, speedometerOutline, cloudOutline, eyeOutline, sunnyOutline, moonOutline, locationOutline });
   }
 
@@ -39,7 +40,6 @@ export class MainpageComponent implements OnInit, OnDestroy {
         map((res: any) => {
           this.currentData = res.currentConditions;
           this.daysData = res.days;
-          console.log(this.currentData);
           return res;
         }),
         catchError((error) => {
@@ -53,6 +53,13 @@ export class MainpageComponent implements OnInit, OnDestroy {
           console.log('No data due to error.');
         }
       });
+  }
+  selectDate(item: any) {
+    localStorage.setItem("hours", item.hours);
+    this.navigator();
+  }
+  navigator(): void {
+    this.router.navigate(['/time'])
   }
   toCelsius(temp: number): string {
     return ((temp - 32) * 5 / 9).toFixed(1);
