@@ -5,7 +5,7 @@
         <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
           <ion-icon name="location-outline" size="large" color="primary"></ion-icon>
           <ion-text style="color: black;">
-            <h2 style="margin: 0;">Madurai</h2>
+            <h2 style="margin: 0;">{{location}}</h2>
           </ion-text>
         </div>
       </ion-col>
@@ -16,7 +16,7 @@
         <ion-card class="weather-card ion-text-center">
           <ion-card-content>
             <ion-text color="primary">
-              <h1 style="font-size: 4rem; font-weight: bold;">{{ toCelsius(currentData.temp) }}°C</h1>
+              <h1 style="font-size: 4rem; font-weight: bold;">{{ toCelsius(currentData.temp || 0) }}°C</h1>
             </ion-text>
             <ion-text color="medium">
               <p style="font-size: 1.2rem; text-transform: capitalize;">
