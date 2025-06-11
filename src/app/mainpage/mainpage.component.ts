@@ -105,7 +105,7 @@ export class MainpageComponent implements OnInit, OnDestroy {
             this.location = res.address.state_district;
             return res;
           }),
-          catchError((error) => {
+          catchError((error: any) => {
             console.error('Weather API error:', error);
             return of(null);
           })
