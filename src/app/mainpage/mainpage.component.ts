@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Geolocation, PermissionStatus } from '@capacitor/geolocation';
 import {
@@ -74,7 +74,8 @@ export class MainpageComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly apiServices: ApicallService,
-    private readonly router: Router
+    private readonly router: Router,
+    private zone: NgZone
   ) {
     addIcons({ locationOutline, warningOutline, waterOutline, speedometerOutline, cloudOutline, eyeOutline, sunnyOutline, moonOutline });
   }
@@ -135,8 +136,16 @@ export class MainpageComponent implements OnInit, OnDestroy {
         .pipe(
           takeUntil(this.desubscribe$),
           map((res: any) => {
-            this.location = res.results[0].
-              components.city;
+            console.log(res.results[0].
+              components.state_district
+              , "")
+            const city =
+              res.results[0].
+                components.state_district ||
+              this.zone.run(() => {
+                this.location = city;
+              });
+            console.log(this.location, city, 'Ans');
             return res;
           }),
           catchError((error: any) => {
