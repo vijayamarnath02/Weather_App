@@ -8,3 +8,64 @@ ion-icon {
     margin-right: 5px;
     vertical-align: middle;
 }
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    text-align: center;
+}
+
+.loading-state ion-spinner {
+    width: 48px;
+    height: 48px;
+}
+
+/* Permission Denied State */
+.permission-denied {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    text-align: center;
+    padding: 20px;
+}
+
+.permission-denied ion-icon {
+    margin-bottom: 16px;
+}
+
+/* Error State */
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    text-align: center;
+    padding: 20px;
+}
+
+.error-state ion-icon {
+    margin-bottom: 16px;
+}
+
+/* Forecast Cards */
+.forecast-card {
+    margin: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.forecast-card:hover {
+    transform: scale(1.03);
+}
+
+swiper-container {
+    padding: 8px 0;
+    --swiper-pagination-bullet-inactive-color: var(--ion-color-step-200);
+    --swiper-pagination-color: var(--ion-color-primary); }

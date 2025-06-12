@@ -1,96 +1,138 @@
 <ion-content class="ion-padding" [fullscreen]="true">
-  <ion-grid class="weather-grid">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <ion-text color="medium">
+      <p>Getting your weather data...</p>
+    </ion-text>
+  </div>
+
+  <!-- Permission Denied State -->
+  <div *ngIf="locationPermissionStatus === 'denied'" class="permission-denied">
+    <ion-icon name="location-outline" size="large" color="danger"></ion-icon>
+    <ion-text color="medium">
+      <h3>Location Access Required</h3>
+      <p>Please enable location permissions to get accurate weather data.</p>
+    </ion-text>
+    <ion-button (click)="retryLocation()" expand="block" color="primary">
+      Grant Permission
+    </ion-button>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <ion-icon name="warning-outline" size="large" color="danger"></ion-icon>
+    <ion-text color="danger">
+      <p>{{ errorMessage }}</p>
+    </ion-text>
+    <ion-button (click)="retryLocation()" expand="block" color="primary">
+      Try Again
+    </ion-button>
+  </div>
+
+  <!-- Main Content -->
+  <ion-grid class="weather-grid" *ngIf="locationPermissionStatus === 'granted' && !isLoading && !errorMessage">
+    <!-- Location Header -->
     <ion-row>
       <ion-col>
         <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
           <ion-icon name="location-outline" size="large" color="primary"></ion-icon>
           <ion-text style="color: black;">
-            <h2 style="margin: 0;">{{location}}</h2>
+            <h2 style="margin: 0;">{{location || 'Current Location'}}</h2>
+            <p style="margin: 0; font-size: 0.9rem;">{{ date }}</p>
           </ion-text>
         </div>
       </ion-col>
     </ion-row>
 
+    <!-- Current Weather Card -->
     <ion-row class="ion-justify-content-center">
       <ion-col size="12" size-md="6">
         <ion-card class="weather-card ion-text-center">
           <ion-card-content>
             <ion-text color="primary">
-              <h1 style="font-size: 4rem; font-weight: bold;">{{ toCelsius(currentData.temp || 0) }}°C</h1>
+              <h1 style="font-size: 4rem; font-weight: bold; margin: 0;">
+                {{ toCelsius(currentData?.temp || 0) }}°C
+              </h1>
             </ion-text>
+
             <ion-text color="medium">
-              <p style="font-size: 1.2rem; text-transform: capitalize;">
-                {{ currentData.conditions }}
+              <p style="font-size: 1.2rem; text-transform: capitalize; margin: 0.5rem 0;">
+                {{ currentData?.conditions || '--' }}
               </p>
-              <img
+              <img *ngIf="currentData?.icon"
                 [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + currentData.icon + '.png'"
-                alt="{{ currentData.conditions }}" width="100" height="100" />
+                alt="{{ currentData?.conditions }}" width="100" height="100" />
             </ion-text>
+
             <ion-grid>
               <ion-row style="color: black;">
-                <ion-col size=" 6">
+                <ion-col size="6">
                   <ion-icon name="water-outline" style="color: black;"></ion-icon>
-                  <p style="color: black;">Humidity: {{ currentData.humidity }}%</p>
+                  <p style="color: black;">Humidity: {{ currentData?.humidity || '--' }}%</p>
                 </ion-col>
                 <ion-col size="6">
                   <ion-icon name="speedometer-outline"></ion-icon>
-                  <p>Pressure: {{ currentData.pressure }} hPa</p>
+                  <p>Pressure: {{ currentData?.pressure || '--' }} hPa</p>
                 </ion-col>
               </ion-row>
+
               <ion-row style="color: black;">
-                <ion-col size=" 6">
+                <ion-col size="6">
                   <ion-icon name="cloud-outline"></ion-icon>
-                  <p>Clouds: {{ currentData.cloudcover }}%</p>
+                  <p>Clouds: {{ currentData?.cloudcover || '--' }}%</p>
                 </ion-col>
                 <ion-col size="6">
                   <ion-icon name="eye-outline"></ion-icon>
-                  <p>Visibility: {{ currentData.visibility }} km</p>
+                  <p>Visibility: {{ currentData?.visibility || '--' }} km</p>
                 </ion-col>
               </ion-row>
+
               <ion-row style="color: black;">
                 <ion-col size="6" color="primary">
                   <ion-icon name="sunny-outline"></ion-icon>
-                  <p>Sunrise: {{ currentData.sunrise }}</p>
+                  <p>Sunrise: {{ currentData?.sunrise || '--' }}</p>
                 </ion-col>
                 <ion-col size="6">
                   <ion-icon name="moon-outline"></ion-icon>
-                  <p>Sunset: {{ currentData.sunset }}</p>
+                  <p>Sunset: {{ currentData?.sunset || '--' }}</p>
                 </ion-col>
               </ion-row>
             </ion-grid>
-
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-    <ion-row>
+
+    <!-- Forecast Slider -->
+    <ion-row *ngIf="daysData?.length > 0">
       <ion-col>
+        <ion-text color="primary">
+          <h3 style="margin-left: 16px;">5-Day Forecast</h3>
+        </ion-text>
+
         <swiper-container slides-per-view="2" [loop]="true" [autoplay]="{ delay: 2000, disableOnInteraction: false }">
-          @for (item of daysData; track $index) {
-          <swiper-slide>
-            <ion-card (click)="selectDate(item)">
+          <swiper-slide *ngFor="let item of daysData">
+            <ion-card (click)="selectDate(item)" class="forecast-card">
               <ion-card-header>
-                <img
+                <img *ngIf="item.icon"
                   [src]="'https://raw.githubusercontent.com/visualcrossing/WeatherIcons/main/PNG/2nd%20Set%20-%20Color/' + item.icon + '.png'"
-                  alt="{{ item.conditions }}" width="100" height="100" />
+                  alt="{{ item.conditions }}" width="60" height="60" />
               </ion-card-header>
 
               <ion-card-content>
-                <ion-text
-                  style="text-align: center;align-items: center;justify-content: center;display: flex;font-size: 2rem;color: black;">
-                  {{ toCelsius(currentData.temp) }}°C
+                <ion-text style="text-align: center; font-size: 1.5rem; color: black;">
+                  {{ toCelsius(item.temp) }}°C
                 </ion-text>
                 <ion-text
-                  style="text-align: center;align-items: center;justify-content: center;display: flex;font-size: 1rem;color: azure;">
-                  {{item.datetime}}
+                  style="text-align: center; font-size: 0.9rem; color: var(--ion-color-medium); display: block; margin-top: 4px;">
+                  {{ formatDate(item.datetime) }}
                 </ion-text>
               </ion-card-content>
-            </ion-card></swiper-slide>
-          }
+            </ion-card>
+          </swiper-slide>
         </swiper-container>
-
       </ion-col>
     </ion-row>
-
   </ion-grid>
 </ion-content>

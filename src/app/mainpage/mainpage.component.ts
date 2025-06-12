@@ -1,7 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Geolocation } from '@capacitor/geolocation';
+import { Geolocation, PermissionStatus } from '@capacitor/geolocation';
 import {
+  IonButton,
   IonCard,
   IonCardContent,
   IonCol,
@@ -9,6 +11,7 @@ import {
   IonGrid,
   IonIcon,
   IonRow,
+  IonSpinner,
   IonText
 } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
@@ -19,6 +22,7 @@ import {
   moonOutline,
   speedometerOutline,
   sunnyOutline,
+  warningOutline,
   waterOutline
 } from 'ionicons/icons';
 import { catchError, map, of, Subject, takeUntil } from 'rxjs';
@@ -40,7 +44,10 @@ register();
     IonRow,
     IonGrid,
     IonIcon,
-    IonContent
+    IonContent,
+    IonButton,
+    IonSpinner,
+    CommonModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -61,43 +68,71 @@ export class MainpageComponent implements OnInit, OnDestroy {
   locationCoords: { latitude: number; longitude: number } | null = null;
   watchId: string | null = null;
   location: string = '';
+  locationPermissionStatus: 'granted' | 'denied' | 'prompt' | 'unknown' = 'unknown';
+  isLoading = false;
+  errorMessage: string | null = null;
 
   constructor(
     private readonly apiServices: ApicallService,
     private readonly router: Router
   ) {
-    addIcons({
-      waterOutline,
-      speedometerOutline,
-      cloudOutline,
-      eyeOutline,
-      sunnyOutline,
-      moonOutline,
-      locationOutline
-    });
-  }
-  ngOnInit(): void {
-    this.requestPermission(); // ask for permission
-    this.getCurrentLocationAndLoadWeather(); // get location then call API
+    addIcons({ locationOutline, warningOutline, waterOutline, speedometerOutline, cloudOutline, eyeOutline, sunnyOutline, moonOutline });
   }
 
+  async ngOnInit(): Promise<void> {
+    try {
+      this.isLoading = true;
+      const permissionStatus = await this.requestPermission();
 
-  async requestPermission() {
-    const permission = await Geolocation.requestPermissions();
-    console.log('Permission result:', permission);
-    if (permission.location === 'granted') {
-      this.startWatchingLocation();
+      if (permissionStatus?.location === 'granted') {
+        await this.getCurrentLocationAndLoadWeather();
+        this.startWatchingLocation();
+      } else {
+        this.locationPermissionStatus = 'denied';
+        this.errorMessage = 'Location permission is required for accurate weather data.';
+      }
+    } catch (error) {
+      console.error('Initialization error:', error);
+      this.errorMessage = 'Failed to initialize location services.';
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  async getCurrentLocationAndLoadWeather() {
+  async requestPermission(): Promise<PermissionStatus | null> {
     try {
-      const position = await Geolocation.getCurrentPosition();
+      const status = await Geolocation.checkPermissions();
+
+      if (status.location !== 'granted') {
+        this.locationPermissionStatus = 'prompt';
+        const permission = await Geolocation.requestPermissions();
+        this.locationPermissionStatus = permission.location === 'granted' ? 'granted' : 'denied';
+        return permission;
+      }
+
+      this.locationPermissionStatus = 'granted';
+      return status;
+    } catch (error) {
+      console.error('Permission request error:', error);
+      this.locationPermissionStatus = 'denied';
+      return null;
+    }
+  }
+
+  async getCurrentLocationAndLoadWeather(): Promise<void> {
+    try {
+      this.isLoading = true;
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000
+      });
 
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
 
       this.locationCoords = { latitude: lat, longitude: lon };
+
+      // Load city name
       this.apiServices.getCityFromCoords(lat, lon)
         .pipe(
           takeUntil(this.desubscribe$),
@@ -106,16 +141,14 @@ export class MainpageComponent implements OnInit, OnDestroy {
             return res;
           }),
           catchError((error: any) => {
-            console.error('Weather API error:', error);
+            console.error('Geocoding API error:', error);
+            this.errorMessage = 'Failed to get location name.';
             return of(null);
           })
         )
-        .subscribe((data: any) => {
-          if (!data) {
-            console.log('No data received from weather API.');
-          }
-        });
+        .subscribe();
 
+      // Load weather data
       this.apiServices.getApiReport(lat, lon)
         .pipe(
           takeUntil(this.desubscribe$),
@@ -126,43 +159,46 @@ export class MainpageComponent implements OnInit, OnDestroy {
           }),
           catchError((error) => {
             console.error('Weather API error:', error);
+            this.errorMessage = 'Failed to load weather data.';
             return of(null);
           })
         )
-        .subscribe((data: any) => {
-          if (!data) {
-            console.log('No data received from weather API.');
-          }
-        });
+        .subscribe();
 
     } catch (error) {
       console.error('Location error:', error);
+      this.errorMessage = 'Failed to get your current location.';
+    } finally {
+      this.isLoading = false;
     }
   }
 
+  async startWatchingLocation(): Promise<void> {
+    try {
+      this.watchId = await Geolocation.watchPosition(
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        },
+        (position, err) => {
+          if (err) {
+            console.error('Location watch error:', err);
+            return;
+          }
 
-  startWatchingLocation() {
-    Geolocation.watchPosition(
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      },
-      (position, err) => {
-        if (err) {
-          console.error('Location error:', err);
-          return;
+          if (position) {
+            this.locationCoords = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            };
+            console.log('Location updated:', this.locationCoords);
+          }
         }
-
-        if (position) {
-          this.locationCoords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          };
-          console.log('Live Location:', this.locationCoords);
-        }
-      }
-    );
+      );
+    } catch (error) {
+      console.error('Failed to start watching location:', error);
+    }
   }
 
   selectDate(item: any) {
@@ -179,6 +215,15 @@ export class MainpageComponent implements OnInit, OnDestroy {
     return temp ? ((temp - 32) * 5 / 9).toFixed(1) : '';
   }
 
+  async retryLocation() {
+    this.errorMessage = null;
+    await this.ngOnInit();
+  }
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { weekday: 'short' });
+  }
   ngOnDestroy(): void {
     this.desubscribe$.next();
     this.desubscribe$.complete();
