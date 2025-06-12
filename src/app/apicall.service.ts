@@ -14,7 +14,8 @@ export class ApicallService {
     return this.http.get(url);
   }
   getCityFromCoords(lat: number, lon: number) {
-    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=486dc1f72c8a4cf28b547e960b9717bf`
     return this.http.get(url);
   }
+
 }

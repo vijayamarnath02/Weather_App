@@ -131,17 +131,15 @@ export class MainpageComponent implements OnInit, OnDestroy {
       const lon = position.coords.longitude;
 
       this.locationCoords = { latitude: lat, longitude: lon };
-
-      // Load city name
       this.apiServices.getCityFromCoords(lat, lon)
         .pipe(
           takeUntil(this.desubscribe$),
           map((res: any) => {
-            this.location = res.address.state_district;
+            this.location = res.results[0].
+              components.city;
             return res;
           }),
           catchError((error: any) => {
-            console.error('Geocoding API error:', error);
             this.errorMessage = 'Failed to get location name.';
             return of(null);
           })
@@ -222,7 +220,12 @@ export class MainpageComponent implements OnInit, OnDestroy {
   formatDate(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    return `${day}/${month}/${year}(${weekday})`;
+
   }
   ngOnDestroy(): void {
     this.desubscribe$.next();
