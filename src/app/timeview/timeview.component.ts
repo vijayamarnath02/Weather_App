@@ -1,23 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { IonCard, IonCardContent, IonCol, IonContent, IonGrid, IonHeader, IonRow, IonText, IonTitle, IonToolbar } from "@ionic/angular/standalone";
+import { IonBackButton, IonButtons, IonCard, IonCardContent, IonCol, IonContent, IonGrid, IonHeader, IonRow, IonText, IonTitle, IonToolbar } from "@ionic/angular/standalone";
+import { ApicallService } from '../apicall.service';
 
 @Component({
   selector: 'app-timeview',
   templateUrl: './timeview.component.html',
   styleUrls: ['./timeview.component.css'],
   standalone: true,
-  imports: [IonTitle, IonToolbar, IonHeader, IonText, IonCol, IonRow, IonGrid, IonCardContent, IonCard, IonContent]
+  imports: [IonBackButton, IonButtons, IonTitle, IonToolbar, IonHeader, IonText, IonCol, IonRow, IonGrid, IonCardContent, IonCard, IonContent]
 })
 export class TimeviewComponent implements OnInit {
   hours: any;
   date: any;
-  constructor() { }
+  constructor(private readonly apiServices: ApicallService) { }
 
   ngOnInit() {
-    this.hours = localStorage.getItem("hours")
-    this.hours = JSON.parse(this.hours)
-    this.date = localStorage.getItem("date");
-    this.date = JSON.parse(this.date)
+    this.getDataUseingRxjs();
+  }
+  getDataUseingRxjs() {
+    this.apiServices.data$.subscribe(data => {
+      this.hours = data;
+    });
+    this.apiServices.date$.subscribe((date) => {
+      this.date = date;
+    })
   }
   toCelsius(temp: number): string {
     return ((temp - 32) * 5 / 9).toFixed(1);
